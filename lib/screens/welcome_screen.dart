@@ -8,7 +8,43 @@ class WelcomeScreen extends StatefulWidget {
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin {
+
+  late AnimationController controller;
+  late Animation animation;
+  @override
+  void initState() {
+    // TODO: implement initState
+    controller = AnimationController(vsync:this  ,
+      duration: Duration(seconds: 1),
+      
+      upperBound:1,
+    );
+    animation = CurvedAnimation(parent: controller, curve: Curves.decelerate);
+    controller.forward();
+    animation.addStatusListener((status) {
+      if(status==AnimationStatus.completed){
+        controller.reverse(
+          from: 1.0
+        );
+      } else if(status==AnimationStatus.dismissed) {
+        controller.forward();
+      }
+    });
+
+
+    controller.addListener(() {
+      setState(() {
+      });
+
+    });
+    super.initState();
+  }
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,15 +57,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Container(
-                  child: Image.asset('images/logo.png'),
-                  height: 60.0,
+                Hero(
+                  child: Container(
+                    child: Image.asset('images/logo.png'),
+                    height: animation.value*80,
+                  ),
+                  tag: 'logo',
                 ),
-                Text(
+                 Text(
                   'Flash Chat',
                   style: TextStyle(
                     fontSize: 45.0,
                     fontWeight: FontWeight.w900,
+                    color: Colors.black54
                   ),
                 ),
               ],
